@@ -24,7 +24,18 @@ const createGameBoard = function createGameBoard(dimension = 3) {
         return NUM_ROWS;
     }
 
-    return { getTile, reset, getDimension };
+    const printBoard = () => {
+        let boardString = '';
+        for (const arr of rows) {
+            for (const tile of arr) {
+                boardString = boardString.concat(`[${tile.getPlayer()}]`);
+            }
+            boardString = boardString.concat('\n');
+        }
+        console.log(boardString);
+    }
+
+    return { getTile, reset, getDimension, printBoard };
 };
 
 const createTile = () => {
@@ -48,18 +59,15 @@ const createPlayer = function (name) {
     return { getName, setName };
 };
 
-const createPointTracker = () => {
-    let dimension = 3;
+const createPointTracker = (dimension) => {
     let max = 0;
-    const initialize = function (dim = 3) {
-        this.dimension = dim;
-    };
     const row = new Int16Array(dimension);
     const col = new Int16Array(dimension);
 
     const incrementRowCount = (rowIndex) => {
         if (row != null) {
             row[rowIndex]++;
+            console.log(`row index is ${row}`);
             if (row[rowIndex] > max) {
                 max = row[rowIndex];
             }
@@ -68,6 +76,7 @@ const createPointTracker = () => {
     const incrementColCount = (colIndex) => {
         if (col != null) {
             col[colIndex]++;
+            console.log(`col index is ${col}`);
             if (col[colIndex] > max) {
                 max = col[colIndex];
             }
@@ -78,18 +87,29 @@ const createPointTracker = () => {
     let antiDiagonal = 0;
     const incrementDiagonal = () => {
         diagonal++;
+        console.log(`diagonal index is ${diagonal}`);
         if (diagonal > max) {
             max = diagonal;
         }
     };
+
     const incrementAntiDiagonal = () => {
         antiDiagonal++;
+        console.log(`diagonal index is ${antiDiagonal}`);
         if (antiDiagonal > max) {
             max = antiDiagonal;
         }
     }
 
     const getPoints = () => max;
+
+    const reset = () => {
+        diagonal = 0;
+        antiDiagonal = 0;
+        max = 0;
+        row.fill(0);
+        col.fill(0);
+    }
 
     return {
         initialize, incrementRowCount, incrementColCount,
@@ -106,7 +126,7 @@ const createPlayerManager = (name) => {
         if (row === col) {
             playerPointManager.incrementDiagonal();
         }
-        if ((row + col - 1) === gameDimension) {
+        if ((row + col + 1) === gameDimension) {
             playerPointManager.incrementAntiDiagonal();
         }
     }
@@ -116,13 +136,24 @@ const createPlayerManager = (name) => {
     }
 
     const getName = () => player.getName();
-    return { updatePoints, getName, getPoints }
+
+    const reset = () => {
+        playerPointManager.reset();
+    }
+    return { updatePoints, getName, getPoints, resetPlayer: reset }
 }
 
-const createGameModule = (function () {
+const gameModule = (function () {
+    const gameStatus = {
+        ONGOING: 'ongoing',
+        WIN: 'WIN',
+        TIE: 'TIE'
+    }
+
     let player1 = createPlayerManager('1');
     let player2 = createPlayerManager('2');
     let currentPlayer = player1;
+    let currStatus = gameStatus[2];
 
     let GAME_DIMENSION = 3;
     let pointsRequired = GAME_DIMENSION;
@@ -167,27 +198,35 @@ const createGameModule = (function () {
             if (checkTie()) {
                 console.log("tie");
                 reset();
+            } else {
+                nextPlayerTurn();
             }
-            nextPlayerTurn();
         }
+        board.printBoard();
     };
 
+    const getCurrentPlayer = () => {
+        return currentPlayer;
+    }
+
+    const getGameStatus = () => {
+        return status;
+    }
+
     const reset = () => {
-        player1 = createPlayerManager('1');
-        player2 = createPlayerManager('2');
+        player1.reset();
+        player2.reset();
         currentPlayer = player1;
-
-        GAME_DIMENSION = 3;
-        pointsRequired = GAME_DIMENSION;
-
-        board = createGameBoard(GAME_DIMENSION);
         markedTiles = 0;
+        board.reset();
     }
     return { playRound };
-});
+})();
 
-const game = createGameModule();
-
-game.playRound(1, 0);
+gameModule.playRound(0, 2);
+gameModule.playRound(0, 0);
+gameModule.playRound(1, 1);
+gameModule.playRound(0, 1);
+gameModule.playRound(2, 0);
 
 
