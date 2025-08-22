@@ -123,7 +123,8 @@ const createPointTracker = (dimension) => {
 
     return {
         incrementRowCount, incrementColCount,
-        incrementDiagonal, incrementAntiDiagonal, getPoints
+        incrementDiagonal, incrementAntiDiagonal, getPoints,
+        reset
     };
 };
 
