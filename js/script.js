@@ -150,16 +150,22 @@ const gameModule = (function () {
         TIE: 'TIE'
     }
 
+    let players = [];
+
+    const addPlayer = () => {
+        const playerNumber = players.length + 1;
+        players.push(createPlayerManager(`${playerNumber}`));
+    }
+
     let player1 = createPlayerManager('1');
     let player2 = createPlayerManager('2');
     let currentPlayer = player1;
-    let currStatus = gameStatus[2];
+    let currStatus = gameStatus.ONGOING;
 
     let GAME_DIMENSION = 3;
     let pointsRequired = GAME_DIMENSION;
 
     let board = createGameBoard(GAME_DIMENSION);
-
 
     let markedTiles = 0;
     const placeSymbol = function (row, col) {
@@ -210,7 +216,7 @@ const gameModule = (function () {
     }
 
     const getGameStatus = () => {
-        return status;
+        return gameStatus;
     }
 
     const reset = () => {
@@ -220,9 +226,12 @@ const gameModule = (function () {
         markedTiles = 0;
         board.reset();
     }
-    return { playRound };
+    return { playRound, getCurrentPlayer, getGameStatus };
 })();
 
+const displayManager = (function () {
+
+})();
 gameModule.playRound(0, 2);
 gameModule.playRound(0, 0);
 gameModule.playRound(1, 1);
