@@ -140,7 +140,7 @@ const createPlayerManager = (name) => {
     const reset = () => {
         playerPointManager.reset();
     }
-    return { updatePoints, getName, getPoints, resetPlayer: reset }
+    return { updatePoints, getName, getPoints, reset }
 }
 
 const gameModule = (function () {
