@@ -59,8 +59,13 @@ const createPlayer = function (name) {
     return { getName, setName };
 };
 
+/*
+*
+*
+*
+*/
 const createPointTracker = (dimension) => {
-    let max = 0;
+    let maxTileCount = 0;
     const row = new Int16Array(dimension);
     const col = new Int16Array(dimension);
 
@@ -68,8 +73,8 @@ const createPointTracker = (dimension) => {
         if (row != null) {
             row[rowIndex]++;
             console.log(`row index is ${row}`);
-            if (row[rowIndex] > max) {
-                max = row[rowIndex];
+            if (row[rowIndex] > maxTileCount) {
+                maxTileCount = row[rowIndex];
             }
         }
     };
@@ -77,8 +82,8 @@ const createPointTracker = (dimension) => {
         if (col != null) {
             col[colIndex]++;
             console.log(`col index is ${col}`);
-            if (col[colIndex] > max) {
-                max = col[colIndex];
+            if (col[colIndex] > maxTileCount) {
+                maxTileCount = col[colIndex];
             }
         }
     };
@@ -87,8 +92,8 @@ const createPointTracker = (dimension) => {
     const incrementDiagonal = () => {
         diagonal++;
         console.log(`diagonal index is ${diagonal}`);
-        if (diagonal > max) {
-            max = diagonal;
+        if (diagonal > maxTileCount) {
+            maxTileCount = diagonal;
         }
     };
 
@@ -96,17 +101,17 @@ const createPointTracker = (dimension) => {
     const incrementAntiDiagonal = () => {
         antiDiagonal++;
         console.log(`diagonal index is ${antiDiagonal}`);
-        if (antiDiagonal > max) {
-            max = antiDiagonal;
+        if (antiDiagonal > maxTileCount) {
+            maxTileCount = antiDiagonal;
         }
     }
 
-    const getPoints = () => max;
+    const getPoints = () => maxTileCount;
 
     const reset = () => {
         diagonal = 0;
         antiDiagonal = 0;
-        max = 0;
+        maxTileCount = 0;
         row.fill(0);
         col.fill(0);
     }
