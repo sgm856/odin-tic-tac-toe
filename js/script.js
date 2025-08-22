@@ -84,7 +84,6 @@ const createPointTracker = (dimension) => {
     };
 
     let diagonal = 0;
-    let antiDiagonal = 0;
     const incrementDiagonal = () => {
         diagonal++;
         console.log(`diagonal index is ${diagonal}`);
@@ -93,6 +92,7 @@ const createPointTracker = (dimension) => {
         }
     };
 
+    let antiDiagonal = 0;
     const incrementAntiDiagonal = () => {
         antiDiagonal++;
         console.log(`diagonal index is ${antiDiagonal}`);
@@ -112,7 +112,7 @@ const createPointTracker = (dimension) => {
     }
 
     return {
-        initialize, incrementRowCount, incrementColCount,
+        incrementRowCount, incrementColCount,
         incrementDiagonal, incrementAntiDiagonal, getPoints
     };
 };
@@ -145,7 +145,7 @@ const createPlayerManager = (name) => {
 
 const gameModule = (function () {
     const gameStatus = {
-        ONGOING: 'ongoing',
+        ONGOING: 'ONGOING',
         WIN: 'WIN',
         TIE: 'TIE'
     }
@@ -232,6 +232,7 @@ const gameModule = (function () {
 const displayManager = (function () {
 
 })();
+
 gameModule.playRound(0, 2);
 gameModule.playRound(0, 0);
 gameModule.playRound(1, 1);
