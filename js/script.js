@@ -60,9 +60,13 @@ const createPlayer = function (name) {
 };
 
 /*
-*
-*
-*
+*   The point tracker tracks a single player's number of placed tiles
+*   per row or column.
+*   It uses two arrays and two integers to track how many tiles have
+*   been placed in a given row, column, or diagonal line. This allows
+*   for fast win checks.
+*   It tracks which row, column, or diagonal has the highest number
+*   of placed tiles.
 */
 const createPointTracker = (dimension) => {
     let maxTileCount = 0;
@@ -78,6 +82,7 @@ const createPointTracker = (dimension) => {
             }
         }
     };
+
     const incrementColCount = (colIndex) => {
         if (col != null) {
             col[colIndex]++;
