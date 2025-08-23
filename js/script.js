@@ -76,7 +76,6 @@ const createPointTracker = (dimension) => {
     const incrementRowCount = (rowIndex) => {
         if (row != null) {
             row[rowIndex]++;
-            console.log(`row index is ${row}`);
             if (row[rowIndex] > maxTileCount) {
                 maxTileCount = row[rowIndex];
             }
@@ -86,7 +85,6 @@ const createPointTracker = (dimension) => {
     const incrementColCount = (colIndex) => {
         if (col != null) {
             col[colIndex]++;
-            console.log(`col index is ${col}`);
             if (col[colIndex] > maxTileCount) {
                 maxTileCount = col[colIndex];
             }
@@ -96,7 +94,6 @@ const createPointTracker = (dimension) => {
     let diagonal = 0;
     const incrementDiagonal = () => {
         diagonal++;
-        console.log(`diagonal index is ${diagonal}`);
         if (diagonal > maxTileCount) {
             maxTileCount = diagonal;
         }
@@ -105,7 +102,6 @@ const createPointTracker = (dimension) => {
     let antiDiagonal = 0;
     const incrementAntiDiagonal = () => {
         antiDiagonal++;
-        console.log(`diagonal index is ${antiDiagonal}`);
         if (antiDiagonal > maxTileCount) {
             maxTileCount = antiDiagonal;
         }
@@ -160,22 +156,28 @@ const gameModule = (function () {
         WIN: 'WIN',
         TIE: 'TIE'
     }
+    let currGameStatus = gameStatus.ONGOING;
 
     let players = [];
-
     const addPlayer = () => {
         const playerNumber = players.length + 1;
         players.push(createPlayerManager(`${playerNumber}`));
     }
 
-    let player1 = createPlayerManager('1');
-    let player2 = createPlayerManager('2');
-    let currentPlayer = player1;
-    let currStatus = gameStatus.ONGOING;
+    let numberOfPlayers = 2;
+    const setNumberPlayers = (num) => {
+        numberOfPlayers = num;
+    }
+
+    const createPlayerArray = (numPlayers = 2) => {
+        for (i = 0; i < numPlayers; i++) {
+            addPlayer();
+        }
+        return players[0];
+    };
+    let currentPlayer = createPlayerArray(numberOfPlayers);
 
     let GAME_DIMENSION = 3;
-    let pointsRequired = GAME_DIMENSION;
-
     let board = createGameBoard(GAME_DIMENSION);
 
     let markedTiles = 0;
@@ -190,10 +192,15 @@ const gameModule = (function () {
         return false;
     };
 
+    let currPlayerIndex = 0;
     const nextPlayerTurn = function () {
-        currentPlayer = currentPlayer === player1 ? player2 : player1;
+        currPlayerIndex = (currPlayerIndex + 1) % players.length;
+        console.log(`${currPlayerIndex}`);
+        currentPlayer = players[currPlayerIndex];
+        console.log(`name is ${currentPlayer.getName()}`);
     };
 
+    let pointsRequired = GAME_DIMENSION;
     const checkWin = (pointsRequired) => {
         return currentPlayer.getPoints() > (pointsRequired - 1);
     }
@@ -210,11 +217,11 @@ const gameModule = (function () {
             currentPlayer.updatePoints(row, col, GAME_DIMENSION);
             if (checkWin(pointsRequired)) {
                 console.log("someone won");
-                reset();
+                currGameStatus = gameStatus.WIN;
             }
             if (checkTie()) {
                 console.log("tie");
-                reset();
+                currGameStatus = gameStatus.TIE;
             } else {
                 nextPlayerTurn();
             }
@@ -227,17 +234,19 @@ const gameModule = (function () {
     }
 
     const getGameStatus = () => {
-        return gameStatus;
+        return currGameStatus;
     }
 
     const reset = () => {
-        player1.reset();
-        player2.reset();
-        currentPlayer = player1;
+        for (let i = 0; i < players.length; i++) {
+            players[i].reset();
+        }
+        currentPlayer = players[0];
         markedTiles = 0;
         board.reset();
+        currGameStatus = gameStatus.ONGOING;
     }
-    return { playRound, getCurrentPlayer, getGameStatus };
+    return { playRound, setNumberPlayers, getCurrentPlayer, getGameStatus, reset };
 })();
 
 const displayManager = (function () {
