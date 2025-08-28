@@ -39,19 +39,19 @@ const createGameBoard = function createGameBoard(dimension = 3) {
 };
 
 const createTile = () => {
-    let player = 'empty';
+    let player = 'unmarked';
     const getPlayer = () => player;
     const setPlayer = (playerID) => {
         player = playerID;
     };
     const reset = () => {
-        player = 'empty';
+        player = 'unmarked';
     };
     return { getPlayer, setPlayer, reset };
 };
 
 const createPlayer = function (name) {
-    let playerName = name || 'empty';
+    let playerName = name || 'unmarked';
     const getName = () => playerName;
     const setName = (givenName) => {
         playerName = givenName;
@@ -124,9 +124,9 @@ const createPointTracker = (dimension) => {
     };
 };
 
-const createPlayerManager = (name) => {
+const createPlayerManager = (name, playerPointManager) => {
     let player = createPlayer(name);
-    let playerPointManager = createPointTracker();
+
     const updatePoints = (row, col, gameDimension) => {
         playerPointManager.incrementRowCount(row);
         playerPointManager.incrementColCount(col);
@@ -150,18 +150,23 @@ const createPlayerManager = (name) => {
     return { updatePoints, getName, getPoints, reset }
 }
 
+/*
+* A heavily over-engineered game module that supports more than two players for essentially no reason whatsoever
+*/
 const gameModule = (function () {
     const gameStatus = {
         ONGOING: 'ONGOING',
         WIN: 'WIN',
         TIE: 'TIE'
     }
+    let gameDimension = 3;
     let currGameStatus = gameStatus.ONGOING;
 
     let players = [];
     const addPlayer = () => {
         const playerNumber = players.length + 1;
-        players.push(createPlayerManager(`${playerNumber}`));
+
+        players.push(createPlayerManager(`${playerNumber}`, createPointTracker(gameDimension)));
     }
 
     let numberOfPlayers = 2;
@@ -170,20 +175,19 @@ const gameModule = (function () {
     }
 
     const createPlayerArray = (numPlayers = 2) => {
-        for (i = 0; i < numPlayers; i++) {
+        for (let i = 0; i < numPlayers; i++) {
             addPlayer();
         }
         return players[0];
     };
-    let currentPlayer = createPlayerArray(numberOfPlayers);
 
-    let GAME_DIMENSION = 3;
-    let board = createGameBoard(GAME_DIMENSION);
+    let currentPlayer = createPlayerArray(numberOfPlayers);
+    let board = createGameBoard(gameDimension);
 
     let markedTiles = 0;
     const placeSymbol = function (row, col) {
         const currTile = board.getTile(row, col);
-        if (currTile.getPlayer() === 'empty') {
+        if (currTile.getPlayer() === 'unmarked') {
             currTile.setPlayer(currentPlayer.getName());
             markedTiles++;
             console.log(`${currentPlayer.getName()} placed a tile at ${row}, ${col}`);
@@ -200,13 +204,13 @@ const gameModule = (function () {
         console.log(`name is ${currentPlayer.getName()}`);
     };
 
-    let pointsRequired = GAME_DIMENSION;
+    let pointsRequired = gameDimension;
     const checkWin = (pointsRequired) => {
         return currentPlayer.getPoints() > (pointsRequired - 1);
     }
 
     const checkTie = () => {
-        if (markedTiles == GAME_DIMENSION * GAME_DIMENSION) {
+        if (markedTiles == gameDimension * gameDimension) {
             return true;
         }
         return false;
@@ -214,12 +218,12 @@ const gameModule = (function () {
 
     const playRound = function (row, col) {
         if (placeSymbol(row, col)) {
-            currentPlayer.updatePoints(row, col, GAME_DIMENSION);
+            currentPlayer.updatePoints(row, col, gameDimension);
             if (checkWin(pointsRequired)) {
                 console.log("someone won");
                 currGameStatus = gameStatus.WIN;
             }
-            if (checkTie()) {
+            else if (checkTie()) {
                 console.log("tie");
                 currGameStatus = gameStatus.TIE;
             } else {
@@ -237,6 +241,10 @@ const gameModule = (function () {
         return currGameStatus;
     }
 
+    const getDimension = () => {
+        return gameDimension;
+    }
+
     const reset = () => {
         for (let i = 0; i < players.length; i++) {
             players[i].reset();
@@ -245,14 +253,31 @@ const gameModule = (function () {
         markedTiles = 0;
         board.reset();
         currGameStatus = gameStatus.ONGOING;
+        currPlayerIndex = 0;
     }
-    return { playRound, setNumberPlayers, getCurrentPlayer, getGameStatus, reset };
+    return { playRound, setNumberPlayers, getCurrentPlayer, getGameStatus, getDimension, reset };
 })();
 
 const displayManager = (function () {
+    const doc = document;
 
+    const buildCell = () => {
+        const tile = doc.createElement('div');
+        tile.classList.add('cell');
+        return tile;
+    }
+
+    const buildGrid = () => {
+        const gameWindow = doc.querySelector('.game-window');
+        for (let i = 0; i < gameModule.getDimension() * gameModule.getDimension(); i++) {
+            gameWindow.appendChild(buildCell());
+        }
+    };
+
+    return { buildGrid };
 })();
 
+displayManager.buildGrid();
 gameModule.playRound(0, 2);
 gameModule.playRound(0, 0);
 gameModule.playRound(1, 1);
