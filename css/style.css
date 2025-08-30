@@ -193,6 +193,10 @@ h1 {
     aspect-ratio: 1;
 }
 
+.cell:hover {
+    opacity: 95%;
+}
+
 .controls {
     display: flex;
     justify-content: center;

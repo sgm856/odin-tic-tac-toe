@@ -269,8 +269,14 @@ const displayManager = (function () {
 
     const buildGrid = () => {
         const gameWindow = doc.querySelector('.game-window');
-        for (let i = 0; i < gameModule.getDimension() * gameModule.getDimension(); i++) {
-            gameWindow.appendChild(buildCell());
+        const dim = gameModule.getDimension();
+        let tile = null;
+        for (let i = 0; i < dim * dim; i++) {
+            const row = Math.floor(i / dim);
+            const col = i % dim;
+            tile = buildCell();
+            gameWindow.appendChild(tile);
+            tile.addEventListener('click', () => gameModule.playRound(row, col));
         }
     };
 
@@ -278,10 +284,5 @@ const displayManager = (function () {
 })();
 
 displayManager.buildGrid();
-gameModule.playRound(0, 2);
-gameModule.playRound(0, 0);
-gameModule.playRound(1, 1);
-gameModule.playRound(0, 1);
-gameModule.playRound(2, 0);
 
 
