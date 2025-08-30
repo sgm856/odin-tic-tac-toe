@@ -171,16 +171,18 @@ const winManager = (function () {
 })();
 
 /*
-* A heavily over-engineered game module that supports more than two players for essentially no reason whatsoever
+* A heavily over-engineered game module that supports more than two players for essentially no reason whatsoever,
+* just for sake of practicing thinking about how to make things more future proof
 */
 const gameModule = (function () {
     const gameStatus = {
         ONGOING: 'ONGOING',
         WIN: 'WIN',
-        TIE: 'TIE'
+        TIE: 'TIE',
+        STOPPED: 'STOPPED'
     }
     let gameDimension = 3;
-    let currGameStatus = gameStatus.ONGOING;
+    let currGameStatus = gameStatus.STOPPED;
 
     let players = [];
     const addPlayer = () => {
@@ -273,10 +275,15 @@ const gameModule = (function () {
         currentPlayer = players[0];
         markedTiles = 0;
         board.reset();
-        currGameStatus = gameStatus.ONGOING;
+        currGameStatus = gameStatus.STOPPED;
         currPlayerIndex = 0;
     }
-    return { playRound, getCurrentPlayer, getGameStatus, getGameBoard, getDimension, reset };
+
+    const start = () => {
+        currGameStatus = gameStatus.ONGOING;
+    }
+
+    return { playRound, getCurrentPlayer, getGameStatus, getGameBoard, getDimension, start, reset };
 })();
 
 const displayManager = (function () {
@@ -300,7 +307,7 @@ const displayManager = (function () {
             } else if (tile.getPlayer() == '2') {
                 element.textContent = 'O';
             } else {
-                tile.textContent = '';
+                element.textContent = '';
             }
         });
 
@@ -344,6 +351,11 @@ const displayManager = (function () {
     resetButton.addEventListener('click', () => {
         resetDisplay();
         gameModule.reset();
+    });
+
+    const startButton = doc.querySelector('.start');
+    startButton.addEventListener('click', () => {
+        gameModule.start();
     });
 
     buildGrid();

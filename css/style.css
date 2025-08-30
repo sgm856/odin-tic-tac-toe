@@ -175,14 +175,14 @@ h1 {
 
 .game-container {
     max-width: 100vw;
-    min-width: 30vw;
+    min-width: 25vw;
 }
 
 .game-window {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
-    min-width: 30%;
+    min-width: 25%;
     max-height: 100%;
     row-gap: 1%;
     column-gap: 1%;
@@ -197,7 +197,7 @@ h1 {
     justify-content: center;
     align-items: center;
     font-size: calc(1rem + 5vw);
-    background-color: #113F67;
+    background-color: #226bac;
     border-radius: 1rem;
     aspect-ratio: 1;
     color: white;
@@ -209,8 +209,7 @@ h1 {
 
 .stats-area-container {
     display: flex;
-    gap: 5vw;
-    justify-content: center;
+    justify-content: space-between;
     margin: 1rem;
 }
 
