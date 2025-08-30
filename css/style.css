@@ -168,14 +168,14 @@ h1 {
 .game-area {
     display: flex;
     flex: 1;
-    max-height: 90vh;
+    max-height: 60vh;
     background-color: white;
     justify-content: center;
 }
 
 .game-container {
     max-width: 100vw;
-    min-width: 25vw;
+    min-width: 20vw;
 }
 
 .game-window {
@@ -184,6 +184,7 @@ h1 {
     grid-template-rows: 1fr 1fr 1fr;
     min-width: 25%;
     max-height: 100%;
+    max-width: 35vw;
     row-gap: 1%;
     column-gap: 1%;
     justify-content: center;
@@ -221,10 +222,36 @@ h1 {
     gap: 1rem;
 }
 
+.player-setup {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 0.4rem;
+}
+
 .controls {
     display: flex;
     justify-content: center;
     gap: 1rem;
+}
+
+button {
+    outline: none;
+    border: none;
+    border-radius: 0.3125rem;
+    max-width: 6.25rem;
+    background-color: #226bac;
+    color: white;
+    font-weight: 800;
+    font-size: 1.1rem;
+    padding: 0.625rem 1.25rem;
+}
+
+button:hover {
+    opacity: 98%;
+    cursor: pointer;
+    transform: translateY(-2px);
+    transition: transform 0.25s ease;
 }
 
 footer {

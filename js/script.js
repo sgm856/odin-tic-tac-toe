@@ -280,7 +280,8 @@ const gameModule = (function () {
     }
 
     const start = () => {
-        currGameStatus = gameStatus.ONGOING;
+        if (currGameStatus === gameStatus.STOPPED)
+            currGameStatus = gameStatus.ONGOING;
     }
 
     return { playRound, getCurrentPlayer, getGameStatus, getGameBoard, getDimension, start, reset };
