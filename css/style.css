@@ -188,9 +188,14 @@ h1 {
 }
 
 .cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: calc(1rem + 5vw);
     background-color: #113F67;
     border-radius: 1rem;
     aspect-ratio: 1;
+    color: white;
 }
 
 .cell:hover {

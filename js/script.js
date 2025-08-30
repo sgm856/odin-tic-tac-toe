@@ -24,6 +24,7 @@ const createGameBoard = function createGameBoard(dimension = 3) {
         return NUM_ROWS;
     }
 
+    //for testing
     const printBoard = () => {
         let boardString = '';
         for (const arr of rows) {
@@ -241,6 +242,10 @@ const gameModule = (function () {
         return currGameStatus;
     }
 
+    const getGameBoard = () => {
+        return board;
+    }
+
     const getDimension = () => {
         return gameDimension;
     }
@@ -255,34 +260,67 @@ const gameModule = (function () {
         currGameStatus = gameStatus.ONGOING;
         currPlayerIndex = 0;
     }
-    return { playRound, setNumberPlayers, getCurrentPlayer, getGameStatus, getDimension, reset };
+    return { playRound, getCurrentPlayer, getGameStatus, getGameBoard, getDimension, reset };
 })();
 
 const displayManager = (function () {
     const doc = document;
+    const gameWindow = doc.querySelector('.game-window');
+    const dim = gameModule.getDimension();
 
     const buildCell = () => {
         const tile = doc.createElement('div');
         tile.classList.add('cell');
         return tile;
-    }
+    };
+
+    const updateGrid = () => {
+        let tiles = doc.querySelectorAll('.cell');
+        tiles.forEach(element => {
+            const tile = gameModule.getGameBoard().getTile(element.dataset.row, element.dataset.col);
+            if (tile.getPlayer() === '1') {
+                element.textContent = 'X';
+            } else if (tile.getPlayer() == '2') {
+                element.textContent = 'O';
+            } else {
+                tile.textContent = '';
+            }
+        });
+    };
 
     const buildGrid = () => {
-        const gameWindow = doc.querySelector('.game-window');
-        const dim = gameModule.getDimension();
         let tile = null;
         for (let i = 0; i < dim * dim; i++) {
             const row = Math.floor(i / dim);
             const col = i % dim;
             tile = buildCell();
+            tile.dataset.row = row;
+            tile.dataset.col = col;
             gameWindow.appendChild(tile);
-            tile.addEventListener('click', () => gameModule.playRound(row, col));
+            tile.addEventListener('click', () => {
+                if (gameModule.getGameStatus() === 'ONGOING') {
+                    gameModule.playRound(row, col);
+                }
+
+                updateGrid();
+            });
         }
     };
 
-    return { buildGrid };
-})();
+    const resetButton = doc.querySelector('.reset');
+    const resetDisplay = () => {
+        for (const tile of gameWindow.children) {
+            tile.textContent = '';
+        }
+    }
 
-displayManager.buildGrid();
+    resetButton.addEventListener('click', () => {
+        resetDisplay();
+        gameModule.reset();
+    });
+
+    buildGrid();
+    return {};
+})();
 
 
