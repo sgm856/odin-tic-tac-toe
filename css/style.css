@@ -165,12 +165,17 @@ h1 {
     font-size: 3rem;
 }
 
-.game-container {
+.game-area {
     display: flex;
     flex: 1;
     max-height: 90vh;
     background-color: white;
     justify-content: center;
+}
+
+.game-container {
+    max-width: 100vw;
+    min-width: 30vw;
 }
 
 .game-window {
@@ -200,6 +205,21 @@ h1 {
 
 .cell:hover {
     opacity: 95%;
+}
+
+.stats-area-container {
+    display: flex;
+    gap: 5vw;
+    justify-content: center;
+    margin: 1rem;
+}
+
+.player-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 }
 
 .controls {

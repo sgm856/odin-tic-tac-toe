@@ -151,6 +151,25 @@ const createPlayerManager = (name, playerPointManager) => {
     return { updatePoints, getName, getPoints, reset }
 }
 
+const winManager = (function () {
+    const playerScores = [0, 0];
+
+    const incrementWins = (player) => {
+        if (player === 0) {
+            playerScores[0] += 1;
+        } else if (player === 1) {
+            playerScores[player] += 1;
+        }
+    }
+
+    const getScore = (player) => {
+        return playerScores[player];
+    }
+
+    const reset = () => { playerScores.fill(0); }
+    return { incrementWins, getScore, reset };
+})();
+
 /*
 * A heavily over-engineered game module that supports more than two players for essentially no reason whatsoever
 */
@@ -200,9 +219,7 @@ const gameModule = (function () {
     let currPlayerIndex = 0;
     const nextPlayerTurn = function () {
         currPlayerIndex = (currPlayerIndex + 1) % players.length;
-        console.log(`${currPlayerIndex}`);
         currentPlayer = players[currPlayerIndex];
-        console.log(`name is ${currentPlayer.getName()}`);
     };
 
     let pointsRequired = gameDimension;
@@ -221,11 +238,10 @@ const gameModule = (function () {
         if (placeSymbol(row, col)) {
             currentPlayer.updatePoints(row, col, gameDimension);
             if (checkWin(pointsRequired)) {
-                console.log("someone won");
+                winManager.incrementWins(currPlayerIndex);
                 currGameStatus = gameStatus.WIN;
             }
             else if (checkTie()) {
-                console.log("tie");
                 currGameStatus = gameStatus.TIE;
             } else {
                 nextPlayerTurn();
@@ -267,6 +283,7 @@ const displayManager = (function () {
     const doc = document;
     const gameWindow = doc.querySelector('.game-window');
     const dim = gameModule.getDimension();
+    const playerScores = doc.querySelectorAll('.player-stats');
 
     const buildCell = () => {
         const tile = doc.createElement('div');
@@ -274,7 +291,7 @@ const displayManager = (function () {
         return tile;
     };
 
-    const updateGrid = () => {
+    const updateDisplay = () => {
         let tiles = doc.querySelectorAll('.cell');
         tiles.forEach(element => {
             const tile = gameModule.getGameBoard().getTile(element.dataset.row, element.dataset.col);
@@ -284,6 +301,14 @@ const displayManager = (function () {
                 element.textContent = 'O';
             } else {
                 tile.textContent = '';
+            }
+        });
+
+        playerScores.forEach(element => {
+            if (element.dataset.player === '0') {
+                element.textContent = winManager.getScore(0);
+            } else if (element.dataset.player === '1') {
+                element.textContent = winManager.getScore(1);
             }
         });
     };
@@ -300,9 +325,11 @@ const displayManager = (function () {
             tile.addEventListener('click', () => {
                 if (gameModule.getGameStatus() === 'ONGOING') {
                     gameModule.playRound(row, col);
+                    if (gameModule.getGameStatus() === 'WIN') {
+                        updateDisplay();
+                    }
                 }
-
-                updateGrid();
+                updateDisplay();
             });
         }
     };
