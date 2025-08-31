@@ -29,7 +29,7 @@ const createGameBoard = function createGameBoard(dimension = 3) {
         let boardString = '';
         for (const arr of rows) {
             for (const tile of arr) {
-                boardString = boardString.concat(`[${tile.getPlayer()}]`);
+                boardString = boardString.concat(`[${tile.getPlayerID()}]`);
             }
             boardString = boardString.concat('\n');
         }
@@ -41,23 +41,25 @@ const createGameBoard = function createGameBoard(dimension = 3) {
 
 const createTile = () => {
     let player = 'unmarked';
-    const getPlayer = () => player;
-    const setPlayer = (playerID) => {
+    const getPlayerID = () => `${player}`;
+    const setPlayerID = (playerID) => {
         player = playerID;
     };
     const reset = () => {
         player = 'unmarked';
     };
-    return { getPlayer, setPlayer, reset };
+    return { getPlayerID, setPlayerID, reset };
 };
 
-const createPlayer = function (name) {
-    let playerName = name || 'unmarked';
+const createPlayer = function (playerID) {
+    let playerName = 'unnamed';
+    const id = playerID;
     const getName = () => playerName;
+    const getID = () => id;
     const setName = (givenName) => {
         playerName = givenName;
     };
-    return { getName, setName };
+    return { getName, setName, getID };
 };
 
 /*
@@ -125,8 +127,8 @@ const createPointTracker = (dimension) => {
     };
 };
 
-const createPlayerManager = (name, playerPointManager) => {
-    let player = createPlayer(name);
+const createPlayerManager = (ID, playerPointManager) => {
+    let player = createPlayer(ID);
 
     const updatePoints = (row, col, gameDimension) => {
         playerPointManager.incrementRowCount(row);
@@ -145,10 +147,14 @@ const createPlayerManager = (name, playerPointManager) => {
 
     const getName = () => player.getName();
 
+    const setName = (newName) => {
+        player.setName(newName);
+    }
+
     const reset = () => {
         playerPointManager.reset();
     }
-    return { updatePoints, getName, getPoints, reset }
+    return { updatePoints, getName, getPoints, setName, reset }
 }
 
 const winManager = (function () {
@@ -186,9 +192,10 @@ const gameModule = (function () {
 
     let players = [];
     const addPlayer = () => {
-        const playerNumber = players.length + 1;
-
-        players.push(createPlayerManager(`${playerNumber}`, createPointTracker(gameDimension)));
+        const playerID = players.length;
+        let newPlayer = createPlayerManager(`${playerID}`, createPointTracker(gameDimension))
+        newPlayer.setName(`Player ${playerID + 1}`);
+        players.push(newPlayer);
     }
 
     let numberOfPlayers = 2;
@@ -209,10 +216,9 @@ const gameModule = (function () {
     let markedTiles = 0;
     const placeSymbol = function (row, col) {
         const currTile = board.getTile(row, col);
-        if (currTile.getPlayer() === 'unmarked') {
-            currTile.setPlayer(currentPlayer.getName());
+        if (currTile.getPlayerID() === 'unmarked') {
+            currTile.setPlayerID(currPlayerIndex);
             markedTiles++;
-            console.log(`${currentPlayer.getName()} placed a tile at ${row}, ${col}`);
             return true;
         }
         return false;
@@ -256,6 +262,10 @@ const gameModule = (function () {
         return currentPlayer;
     }
 
+    const getCurrentPlayerIndex = () => {
+        return currPlayerIndex;
+    }
+
     const getGameStatus = () => {
         return currGameStatus;
     }
@@ -268,6 +278,13 @@ const gameModule = (function () {
         return gameDimension;
     }
 
+    const setPlayerNames = (name1, name2) => {
+        if (players.length >= 2) {
+            players[0].setName(name1 || 'Player 1');
+            players[1].setName(name2 || 'Player 2');
+        }
+    };
+
     const reset = () => {
         for (let i = 0; i < players.length; i++) {
             players[i].reset();
@@ -277,14 +294,15 @@ const gameModule = (function () {
         board.reset();
         currGameStatus = gameStatus.STOPPED;
         currPlayerIndex = 0;
-    }
+    };
 
     const start = () => {
-        if (currGameStatus === gameStatus.STOPPED)
+        if (currGameStatus === gameStatus.STOPPED) {
             currGameStatus = gameStatus.ONGOING;
-    }
+        }
+    };
 
-    return { playRound, getCurrentPlayer, getGameStatus, getGameBoard, getDimension, start, reset };
+    return { playRound, getCurrentPlayer, getGameStatus, getGameBoard, getDimension, getCurrentPlayerIndex, start, setPlayerNames, reset };
 })();
 
 const displayManager = (function () {
@@ -292,6 +310,7 @@ const displayManager = (function () {
     const gameWindow = doc.querySelector('.game-window');
     const dim = gameModule.getDimension();
     const playerScores = doc.querySelectorAll('.player-stats');
+    const playerCards = doc.querySelectorAll('.player-container');
 
     const buildCell = () => {
         const tile = doc.createElement('div');
@@ -303,9 +322,10 @@ const displayManager = (function () {
         let tiles = doc.querySelectorAll('.cell');
         tiles.forEach(element => {
             const tile = gameModule.getGameBoard().getTile(element.dataset.row, element.dataset.col);
-            if (tile.getPlayer() === '1') {
+            console.log(tile.getPlayerID());
+            if (tile.getPlayerID() === '0') {
                 element.textContent = 'X';
-            } else if (tile.getPlayer() == '2') {
+            } else if (tile.getPlayerID() == '1') {
                 element.textContent = 'O';
             } else {
                 element.textContent = '';
@@ -319,6 +339,20 @@ const displayManager = (function () {
                 element.textContent = winManager.getScore(1);
             }
         });
+
+        let currStatus = gameModule.getGameStatus();
+        if (currStatus === 'ONGOING') {
+            if (gameModule.getCurrentPlayerIndex() === 0) {
+                playerCards[0].classList.add('name-highlight');
+                playerCards[1].classList.remove('name-highlight');
+            } else if (gameModule.getCurrentPlayerIndex() === 1) {
+                playerCards[1].classList.add('name-highlight');
+                playerCards[0].classList.remove('name-highlight');
+            }
+        } else if (currStatus === 'WIN' || currStatus === 'TIE' || currStatus === 'STOPPED') {
+            playerCards[0].classList.remove('name-highlight');
+            playerCards[1].classList.remove('name-highlight');
+        }
     };
 
     const buildGrid = () => {
@@ -335,6 +369,7 @@ const displayManager = (function () {
                     gameModule.playRound(row, col);
                     if (gameModule.getGameStatus() === 'WIN') {
                         updateDisplay();
+                        displayMessage(`${gameModule.getCurrentPlayer().getName()} won!`);
                     }
                 }
                 updateDisplay();
@@ -342,8 +377,9 @@ const displayManager = (function () {
         }
     };
 
-    const resetButton = doc.querySelector('.reset');
+    const resetButton = doc.querySelector('.reset-button');
     const resetDisplay = () => {
+        displayMessage('Game reset!\nPress start to play!');
         for (const tile of gameWindow.children) {
             tile.textContent = '';
         }
@@ -354,13 +390,18 @@ const displayManager = (function () {
         gameModule.reset();
     });
 
-    const startButton = doc.querySelector('.start');
+    const startButton = doc.querySelector('.start-button');
     startButton.addEventListener('click', () => {
         gameModule.start();
     });
+    console.log(startButton);
+
+    const messageArea = doc.querySelector('.message-container');
+    const displayMessage = (message) => {
+        messageArea.textContent = message;
+    };
 
     buildGrid();
-    return {};
 })();
 
 

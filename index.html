@@ -14,27 +14,29 @@
     <div class="player-setup">
         <input type="text" id="player1-name" placeholder="Player 1 (X)" maxlength="15">
         <input type="text" id="player2-name" placeholder="Player 2 (O)" maxlength="15">
-        <button class="start">Submit</button>
+        <button class="submit-button">Submit</button>
+    </div>
+    <div class="stats-area-container">
+        <div class="player-container">
+            <div>Player X</div>
+            <div class="player-stats" data-player="0">0</div>
+        </div>
+        <div class="message-container"></div>
+        <div class="player-container">
+            <div>Player O</div>
+            <div class="player-stats" data-player="1">0</div>
+        </div>
     </div>
     <div class="game-area">
 
         <div class="game-container">
-            <div class="stats-area-container">
-                <div class="player-container">
-                    <div>Player X</div>
-                    <div class="player-stats" data-player="0">0</div>
-                </div>
-                <div class="player-container">
-                    <div>Player O</div>
-                    <div class="player-stats" data-player="1">0</div>
-                </div>
-            </div>
+
             <div class="game-window"></div>
         </div>
     </div>
     <div class=controls>
-        <button class="start">Start Game</button>
-        <button class="reset">Reset Game</button>
+        <button class="start-button">Start Game</button>
+        <button class="reset-button">Reset Game</button>
     </div>
 
     <footer>

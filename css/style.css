@@ -210,7 +210,8 @@ h1 {
 
 .stats-area-container {
     display: flex;
-    justify-content: space-between;
+    gap: 5rem;
+    justify-content: center;
     margin: 1rem;
 }
 
@@ -225,7 +226,7 @@ h1 {
 .player-setup {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 5%;
     margin: 0.4rem;
 }
 
@@ -252,6 +253,29 @@ button:hover {
     cursor: pointer;
     transform: translateY(-2px);
     transition: transform 0.25s ease;
+}
+
+.player-container {
+    background-color: #226bac;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 800;
+    max-width: 10%;
+    min-width: 5%;
+    box-shadow: 0px 0px 15px white;
+    border: 4px white solid;
+}
+
+.name-highlight {
+    box-shadow: 0px 0px 15px orange;
+    border: 4px orange solid;
+}
+
+.message-container {
+    max-width: 10vw;
+    min-width: 10vw;
+    text-align: center;
 }
 
 footer {
