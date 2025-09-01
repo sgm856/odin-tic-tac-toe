@@ -386,12 +386,14 @@ const displayManager = (function () {
     resetButton.addEventListener('click', () => {
         resetDisplay();
         gameModule.reset();
+        updateDisplay();
     });
 
     const startButton = doc.querySelector('.start-button');
     startButton.addEventListener('click', () => {
         gameModule.start();
         displayMessage('Game started!');
+        updateDisplay();
     });
 
     const messageArea = doc.querySelector('.message-container');
