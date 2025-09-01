@@ -33,7 +33,6 @@ const createGameBoard = function createGameBoard(dimension = 3) {
             }
             boardString = boardString.concat('\n');
         }
-        console.log(boardString);
     }
 
     return { getTile, reset, getDimension, printBoard };
@@ -309,8 +308,6 @@ const displayManager = (function () {
     const doc = document;
     const gameWindow = doc.querySelector('.game-window');
     const dim = gameModule.getDimension();
-    const playerScores = doc.querySelectorAll('.player-stats');
-    const playerCards = doc.querySelectorAll('.player-container');
 
     const buildCell = () => {
         const tile = doc.createElement('div');
@@ -318,11 +315,12 @@ const displayManager = (function () {
         return tile;
     };
 
+    const playerScores = doc.querySelectorAll('.player-stats');
+    const playerCards = doc.querySelectorAll('.player-container');
     const updateDisplay = () => {
         let tiles = doc.querySelectorAll('.cell');
         tiles.forEach(element => {
             const tile = gameModule.getGameBoard().getTile(element.dataset.row, element.dataset.col);
-            console.log(tile.getPlayerID());
             if (tile.getPlayerID() === '0') {
                 element.textContent = 'X';
             } else if (tile.getPlayerID() == '1') {
@@ -379,7 +377,7 @@ const displayManager = (function () {
 
     const resetButton = doc.querySelector('.reset-button');
     const resetDisplay = () => {
-        displayMessage('Game reset!\nPress start to play!');
+        displayMessage('Game reset!\r\nPress start to play!');
         for (const tile of gameWindow.children) {
             tile.textContent = '';
         }
@@ -393,13 +391,30 @@ const displayManager = (function () {
     const startButton = doc.querySelector('.start-button');
     startButton.addEventListener('click', () => {
         gameModule.start();
+        displayMessage('Game started!');
     });
-    console.log(startButton);
 
     const messageArea = doc.querySelector('.message-container');
     const displayMessage = (message) => {
         messageArea.textContent = message;
     };
+
+
+    const playerNames = doc.querySelectorAll('.player-name-display');
+    const player1NameText = doc.querySelector('#player1-name');
+    const player2NameText = doc.querySelector('#player2-name');
+    const submitButton = doc.querySelector('.submit-button');
+    const submitNames = () => {
+        const player1Name = player1NameText.value ? player1NameText.value : 'Player X';
+        const player2Name = player2NameText.value ? player2NameText.value : 'Player O';
+        gameModule.setPlayerNames(player1Name, player2Name);
+        playerNames[0].textContent = player1Name;
+        playerNames[1].textContent = player2Name;
+    }
+
+    submitButton.addEventListener('click', () => {
+        submitNames();
+    });
 
     buildGrid();
 })();
